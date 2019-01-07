@@ -1,2 +1,2 @@
-# ttml2ddc
-Convert ttml to ddc xml format
+# ttml2tei
+Convert ttml to tei xml format
