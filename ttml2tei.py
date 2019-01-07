@@ -16,7 +16,52 @@ TTS = "{%s}" % ns['tts']
 @click.command()
 @click.argument('ttml', type=click.File('rb'))
 def run(ttml):
-  click.echo("RUN")
+
+  #
+  # read in ttml
+  #
+  ttml_tree = etree.parse(ttml)
+  tt_body = ttml_tree.getroot().find("./" + TT + "body")
+  if tt_body is None:
+    click.echo("No body element found. Aborting", err=True)
+    sys.exit(1)
+
+  #
+  # create destination xml
+  #
+  tei_root = etree.Element("TEI")
+  tei_header = etree.SubElement(tei_root, "teiHeader")
+  text = etree.SubElement(tei_root, "text")
+  body = etree.SubElement(text, "body")
+
+  #
+  # interpret ttml
+  #
+
+  #
+  # add a div element to tei for each div element in ttml
+  for tt_div in tt_body.findall("./" + TT + "div"):
+    div = etree.SubElement(body, "div")
+    div.set("style", tt_div.get("style", ""))
+    
+    #
+    # iterate over tt_p in tt_div and create either hi or lb
+    for tt_p in tt_div.findall("./" + TT + "p"):
+      for child in tt_p:
+        if child.tag == TT + "br":
+          div.append(etree.Element("lb"))
+        elif child.tag == TT + "span":
+          hi = etree.SubElement(div, "hi")
+          hi.text = child.text
+          hi.set("style", child.get("style", ""))
+      div.append(etree.Element("lb"))
+
+  #
+  # print destination xml
+  #
+  click.echo(etree.tostring(tei_root, pretty_print=True, xml_declaration=True, encoding='UTF-8'))
+  
+  
 
 if __name__ == '__main__':
   run()
