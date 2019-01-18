@@ -56,9 +56,9 @@ def run(ttml):
         pb.set(attrib, tt_p.get(attrib, ""))
       for child in tt_p:
         if child.tag == TT + "br":
-          pb.append(etree.Element("lb"))
+          div.append(etree.Element("lb"))
         elif child.tag == TT + "span":
-          hi = etree.SubElement(pb, "hi")
+          hi = etree.SubElement(div, "hi")
           hi.text = child.text
           hi.set("style", child.get("style", ""))
 
