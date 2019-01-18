@@ -39,6 +39,10 @@ def run(ttml):
   #
 
   #
+  # select relevant paragraph attributes to carry over to tei
+  relevant_par_atttrib = ["style", "begin", "end", "region"]
+
+  #
   # add a div element to tei for each div element in ttml
   for tt_div in tt_body.findall("./" + TT + "div"):
     div = etree.SubElement(body, "div")
@@ -47,14 +51,16 @@ def run(ttml):
     #
     # iterate over tt_p in tt_div and create either hi or lb
     for tt_p in tt_div.findall("./" + TT + "p"):
+      pb = etree.SubElement(div, "pb")
+      for attrib in relevant_par_atttrib:
+        pb.set(attrib, tt_p.get(attrib, ""))
       for child in tt_p:
         if child.tag == TT + "br":
-          div.append(etree.Element("lb"))
+          pb.append(etree.Element("lb"))
         elif child.tag == TT + "span":
-          hi = etree.SubElement(div, "hi")
+          hi = etree.SubElement(pb, "hi")
           hi.text = child.text
           hi.set("style", child.get("style", ""))
-      div.append(etree.Element("lb"))
 
   #
   # print destination xml
